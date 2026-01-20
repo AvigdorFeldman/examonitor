@@ -1,27 +1,23 @@
+import { createContext, useContext, useMemo, useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+const SocketContext = createContext(null);
+
+export const useSocket = () => useContext(SocketContext);
+
 export const SocketProvider = ({ children }) => {
   const socket = useMemo(() => {
-    const socketUrl = import.meta.env.VITE_API_BASE;
+    const socketUrl = import.meta.env.VITE_API_BASE ?? '';
     return io(socketUrl, {
       withCredentials: true,
       autoConnect: true,
-      transports: import.meta.env.DEV
-        ? ['polling', 'websocket']
-        : ['websocket']
+      transports: ['polling', 'websocket']
     });
   }, []);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('✅ Connected to Chat Server:', socket.id);
-    });
-
-    socket.on('connect_error', (err) => {
-      console.error('❌ Connection Error:', err.message);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    socket.on('connect', () => console.log('Connected', socket.id));
+    return () => socket.disconnect();
   }, [socket]);
 
   return (
