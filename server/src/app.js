@@ -14,12 +14,15 @@ import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 
-/**
- * Allow frontend to call backend
- */
 app.use(cors({
-  origin: true,
-  credentials: true,
+  origin: 'https://your-vercel-app.vercel.app', // or true for all origins
+  credentials: true
+}));
+
+// Handle preflight globally
+app.options('*', cors({
+  origin: 'https://your-vercel-app.vercel.app',
+  credentials: true
 }));
 
 /**
