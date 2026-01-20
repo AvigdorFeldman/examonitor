@@ -19,12 +19,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Handle preflight globally
-app.options('*', cors({
-  origin: 'https://examonitor-t11n.vercel.app',
-  credentials: true
-}));
-
 /**
  * Parse JSON bodies
  */
