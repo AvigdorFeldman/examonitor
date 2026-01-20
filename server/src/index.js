@@ -1,49 +1,41 @@
-import 'dotenv/config';
-import app from './app.js';
+import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import cors from 'cors';
 
-const PORT = process.env.PORT;
+const app = express();
+const httpServer = http.createServer(app);
 
-const server = http.createServer(app);
+// Prefix שמתקבל לכל דומיין שמתחיל ב־https://examonitor-t11n
+const allowedOriginPrefix = 'https://examonitor-t11n';
 
-const io = new Server(server, {
-  transports: ["websocket"],
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith(allowedOriginPrefix)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+const io = new Server(httpServer, {
   cors: {
-    origin: ["https://examonitor-t11n.vercel.app"],
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+    origin: (origin, callback) => {
+      if (!origin || origin.startsWith(allowedOriginPrefix)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected:', socket.id);
-
-  socket.on('join_room', (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-  });
-
-  socket.on('send_message', ({ room, message }) => {
-    socket.to(room).emit('new_message', {
-      ...message,
-      room
-    });
-  });
-
-  socket.on('new_incident', (incident) => {
-    socket.broadcast.emit('new_incident_received', incident);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected:', socket.id);
-  });
+  console.log('✅ Socket connected:', socket.id);
 });
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+httpServer.listen(5000, () => console.log('Server running on port 5000'));
