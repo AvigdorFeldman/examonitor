@@ -14,10 +14,37 @@ import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 
+const allowedOrigins = [
+  'https://examonitor-t11n.vercel.app',
+  'http://localhost:5173'
+];
+
 app.use(cors({
-  origin: 'https://examonitor-t11n.vercel.app', // or true for all origins
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+const allowedOrigins = [
+  'https://examonitor-t11n.vercel.app',
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 
 /**
  * Parse JSON bodies
