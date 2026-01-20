@@ -1,0 +1,48 @@
+// examsApi.js
+import { apiFetch } from './http';
+
+const useMock = String(import.meta.env.VITE_USE_AUTH_MOCK || "").toLowerCase() === "true";
+
+export const examsApi = {
+  listExams: async (status) => {
+    if (useMock) return [];
+    const query = status && status !== 'all' ? `?status=${status}` : '';
+    return apiFetch(`/exams${query}`);
+  },
+
+  listCourses: async () => {
+    if (useMock) return [];
+    return apiFetch('/exams/courses'); // Note the path matches the route below
+  },
+
+  getExamById: async (examId) => {
+    if (useMock) {
+      return {
+        id: examId,
+        course_id: "CS101",
+        original_start_time: new Date().toISOString(),
+        original_duration: 180,
+        extra_time: 0,
+        status: "active"
+      };
+    }
+    return apiFetch(`/exams/${examId}`);
+  },
+
+  updateExamStatus: async (examId, status, userId) =>
+    apiFetch(`/exams/${examId}/status`, {
+      method: "PATCH",
+      body: { status, userId }
+    }),
+
+  broadcastAnnouncement: async (examId, message) =>
+    apiFetch(`/exams/${examId}/broadcast`, {
+      method: "POST",
+      body: { message }
+    }),
+  addExtraTime: async (examId, additionalMinutes) =>
+    apiFetch(`/exams/${examId}/extra-time`, {
+      method: "PATCH",
+      body: { minutes: additionalMinutes }
+    }),
+};
