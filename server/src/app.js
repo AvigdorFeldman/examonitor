@@ -14,14 +14,11 @@ import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 
-const allowedOrigins = [
-  'https://examonitor-t11n.vercel.app',
-  'http://localhost:5173'
-];
+const allowedOriginPrefix = 'https://examonitor-t11n';
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || origin.startsWith(allowedOriginPrefix)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
