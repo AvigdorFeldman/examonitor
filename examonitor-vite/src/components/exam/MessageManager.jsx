@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import ChatInterface from './ChatInterface';
-import { useSocket } from '../state/SocketContext';
+import { useSocket } from '../state/SocketContext.jsx';
 import { useAuth } from '../state/AuthContext';
 
 export default function MessageManager({ activeTab, userRole }) {
