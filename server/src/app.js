@@ -15,13 +15,13 @@ import notificationRoutes from './routes/notificationRoutes.js';
 const app = express();
 
 app.use(cors({
-  origin: 'https://examonitor-t11n.vercel.app/', // or true for all origins
+  origin: 'https://examonitor-t11n.vercel.app', // or true for all origins
   credentials: true
 }));
 
 // Handle preflight globally
 app.options('*', cors({
-  origin: 'https://examonitor-t11n.vercel.app/',
+  origin: 'https://examonitor-t11n.vercel.app',
   credentials: true
 }));
 
