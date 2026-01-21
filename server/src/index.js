@@ -1,62 +1,53 @@
-// index.js
+import 'dotenv/config';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import app from './app.js'; // your existing Express app
 
-// Create HTTP server
-const httpServer = http.createServer(app);
+const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
 
-// Allowed origin prefix for CORS
-const allowedOriginPrefix = 'https://examonitor-t11n';
+// Allowed origin for client
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'https://examonitor-t11n.vercel.app';
 
-// Express CORS (for REST endpoints)
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith(allowedOriginPrefix)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
-);
+// Express CORS for REST endpoints
+app.use(cors({
+  origin: CLIENT_ORIGIN,
+  credentials: true
+}));
 
 // Socket.IO server
-const io = new Server(httpServer, {
+const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith(allowedOriginPrefix)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Socket not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  },
-  // transports: ['websocket'], // optional: allow polling fallback if needed
+    origin: CLIENT_ORIGIN,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
-// Handle socket connections
+// Socket.IO connection
 io.on('connection', (socket) => {
   console.log('✅ Socket connected:', socket.id);
 
-  // Join rooms
+  // Join room
   socket.on('join_room', (room) => {
     socket.join(room);
     console.log(`Socket ${socket.id} joined room: ${room}`);
   });
 
-  // Send messages to a room
+  // Send message to room
   socket.on('send_message', ({ room, message }) => {
     if (!room || !message) return;
 
-    // Broadcast message to all clients in the room
-    io.to(room).emit('new_message', message);
-    console.log(`Message sent to room ${room}:`, message);
+    // Broadcast to all in the room including sender
+    io.to(room).emit('new_message', { ...message, room });
+  });
+
+  // Example: new incident broadcast
+  socket.on('new_incident', (incident) => {
+    console.log('New incident received:', incident);
+    socket.broadcast.emit('new_incident_received', incident);
   });
 
   socket.on('disconnect', (reason) => {
@@ -64,6 +55,12 @@ io.on('connection', (socket) => {
   });
 });
 
-// Production-ready port
-const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
