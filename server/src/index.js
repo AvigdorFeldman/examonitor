@@ -2,8 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-
-const app = express();
+import app from './app.js';
 const httpServer = http.createServer(app);
 
 // Prefix שמתקבל לכל דומיין שמתחיל ב־https://examonitor-t11n
