@@ -9,11 +9,11 @@ export const SocketProvider = ({ children }) => {
   const socketUrl = import.meta.env.VITE_API_BASE ?? '';
 
   // Memoize socket to avoid re-creating
-  const socket = useMemo(() => io(SOCKET_URL, {
+  const socket = useMemo(() => io(socketUrl, {
     withCredentials: true,
     autoConnect: true,
     transports: ['polling', 'websocket'], // ensures fallback works
-  }), [SOCKET_URL]);
+  }), [socketUrl]);
 
   useEffect(() => {
     socket.on('connect', () => {
