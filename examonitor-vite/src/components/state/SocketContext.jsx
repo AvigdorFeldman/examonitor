@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
     return io(socketUrl, {
       withCredentials: true,
       autoConnect: true,
-      transports: ['polling', 'websocket']
+      transports: ['websocket']
     });
   }, []);
 
