@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext(null);
@@ -6,19 +6,32 @@ const SocketContext = createContext(null);
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
-  const socket = useMemo(() => {
-    const socketUrl = import.meta.env.VITE_API_BASE ?? '';
-    console.log(socketUrl);
-    return io(socketUrl, {
-      withCredentials: true,
-      autoConnect: true,
-      transports: ['websocket']
-    });
-  }, []);
+  const socketUrl = import.meta.env.VITE_API_BASE ?? '';
+
+  // Memoize socket to avoid re-creating
+  const socket = useMemo(() => io(SOCKET_URL, {
+    withCredentials: true,
+    autoConnect: true,
+    transports: ['polling', 'websocket'], // ensures fallback works
+  }), [SOCKET_URL]);
 
   useEffect(() => {
-    socket.on('connect', () => console.log('Connected', socket.id));
-    return () => socket.disconnect();
+    socket.on('connect', () => {
+      console.log('✅ Connected to server:', socket.id);
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('❌ Connection error:', err.message);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('⚠️ Disconnected:', reason);
+    });
+
+    // Clean up on unmount (optional)
+    return () => {
+      socket.disconnect();
+    };
   }, [socket]);
 
   return (
