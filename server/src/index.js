@@ -8,7 +8,7 @@ import app from './app.js'; // your existing Express app
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
-// Allowed origin for client
+// Allowed origin for your Vercel frontend
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'https://examonitor-t11n.vercel.app';
 
 // Express CORS for REST endpoints
@@ -36,15 +36,13 @@ io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} joined room: ${room}`);
   });
 
-  // Send message to room
+  // Send message to room (excluding sender to avoid duplicates)
   socket.on('send_message', ({ room, message }) => {
     if (!room || !message) return;
-
-    // Broadcast to all in the room including sender
-    io.to(room).emit('new_message', { ...message, room });
+    socket.to(room).emit('new_message', { ...message, room });
   });
 
-  // Example: new incident broadcast
+  // Example: broadcast new incident to everyone except sender
   socket.on('new_incident', (incident) => {
     console.log('New incident received:', incident);
     socket.broadcast.emit('new_incident_received', incident);
