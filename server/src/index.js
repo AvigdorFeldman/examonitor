@@ -21,15 +21,9 @@ app.use(cors({
 }));
 
 const io = new Server(httpServer, {
+  transports: ['websocket'],   
   cors: {
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith(allowedOriginPrefix)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST'],
+    origin: true,            
     credentials: true,
   },
 });
