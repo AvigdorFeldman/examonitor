@@ -1,25 +1,23 @@
-import { createContext, useContext, useEffect } from 'react';
-import { socket } from '../../handlers/Socket';
+import { createContext, useContext, useMemo, useEffect } from 'react';
+import { io } from 'socket.io-client';
 
 const SocketContext = createContext(null);
 
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
+  const socket = useMemo(() => {
+    const socketUrl = import.meta.env.VITE_API_BASE ?? '';
+    return io(socketUrl, {
+      withCredentials: true,
+      autoConnect: true,
+      transports: ['websocket']
+    });
+  }, []);
 
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
-
-    socket.on('connect', () => {
-      console.log('Connected', socket.id);
-    });
-
-    return () => {
-      socket.off('connect');
-      socket.disconnect();
-    };
+    socket.on('connect', () => console.log('Connected', socket.id));
+    return () => socket.disconnect();
   }, [socket]);
 
   return (
