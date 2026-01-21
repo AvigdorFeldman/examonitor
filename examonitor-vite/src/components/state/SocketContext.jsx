@@ -20,7 +20,7 @@ export const SocketProvider = ({ children }) => {
       socket.off('connect');
       socket.disconnect();
     };
-  }, []);
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={socket}>
