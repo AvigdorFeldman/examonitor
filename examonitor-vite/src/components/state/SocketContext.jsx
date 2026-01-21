@@ -8,6 +8,7 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }) => {
   const socket = useMemo(() => {
     const socketUrl = import.meta.env.VITE_API_BASE ?? '';
+    console.log(socketUrl);
     return io(socketUrl, {
       withCredentials: true,
       autoConnect: true,
