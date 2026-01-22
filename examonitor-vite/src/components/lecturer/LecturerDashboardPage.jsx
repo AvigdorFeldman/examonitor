@@ -22,11 +22,13 @@ import { timerHandlers } from '../../handlers/timerHandlers';
 import { notificationHandlers } from '../../handlers/notificationHandlers';
 import StatCard from '../exam/StatCard';
 import ViewClassroomsPage from '../classroom/ViewClassroomsPage';
+import {useAuth} from '../state/AuthContext';
 
 
 export default function LecturerDashboardPage() {
   const { examId } = useParams();
   const { examData, setExamData } = useExam();
+  const { user} = useAuth();
   
   // ניהול מצב
   const [activeTab, setActiveTab] = useState('notifications'); 
