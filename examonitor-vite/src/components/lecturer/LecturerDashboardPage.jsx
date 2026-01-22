@@ -209,7 +209,6 @@ export default function LecturerDashboardPage() {
 
   const tabs = [
     { id: 'floor_chat', icon: '🏢', label: 'משגיח קומה' },
-    { id: 'notifications', icon: '🔔', label: 'התראות ויומן' },
   ];
 
   return (
@@ -236,7 +235,7 @@ export default function LecturerDashboardPage() {
               <h1 className="text-3xl font-bold text-white leading-none tracking-tight">
                 {activeMainTab === 'dashboard' && 'מסך נתונים למרצה'}
                 {activeMainTab === 'rooms' && 'ניהול כיתות'}
-                {activeMainTab === 'logs' && 'יומן אירועים'}
+                {activeMainTab === 'logs' && 'סטטיסטיקות'}
               </h1>
               <div className="flex items-center gap-3 mt-3">
                 <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${
